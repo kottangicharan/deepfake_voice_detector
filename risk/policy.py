@@ -7,7 +7,7 @@ below are heuristic, chosen with the same cost-tradeoff reasoning (a false accep
 change is far costlier than one extra step-up), not fit against a labeled fusion-level dataset —
 no such dataset exists yet. Say so rather than imply a calibration that hasn't happened.
 """
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 
 from risk.degradation import tighten_thresholds
 from risk.types import Decision

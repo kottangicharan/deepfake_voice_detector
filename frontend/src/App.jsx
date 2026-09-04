@@ -1,35 +1,80 @@
-import { useEffect, useState } from "react";
-import CaseQueue from "./CaseQueue.jsx";
-import CaseDetail from "./CaseDetail.jsx";
-import LiveCall from "./LiveCall.jsx";
-import { getCases } from "./api.js";
+import { useState, useCallback } from "react";
+import { AnimatePresence } from "motion/react";
+import UploadView from "./UploadView.jsx";
+import AnalyzingView from "./AnalyzingView.jsx";
+import ResultView from "./ResultView.jsx";
+import LiveMicView from "./LiveMicView.jsx";
+import AdminView from "./AdminView.jsx";
 
+/**
+ * View state machine:
+ *   upload ──┬── analyzing ──→ result ──→ admin
+ *            └── mic ─────────→ result       │
+ *              ↑                              │
+ *              └──────── (reset) ─────────────┘
+ */
 export default function App() {
-  const [cases, setCases] = useState([]);
-  const [selectedId, setSelectedId] = useState(null);
+  const [view, setView] = useState("upload");
+  const [result, setResult] = useState(null);
+  const [analyzeFile, setAnalyzeFile] = useState(null);
 
-  async function refresh() {
-    const data = await getCases();
-    setCases(data.cases);
-  }
-
-  useEffect(() => {
-    refresh();
-    const id = setInterval(refresh, 5000);
-    return () => clearInterval(id);
+  const handleFileSelected = useCallback((file) => {
+    setAnalyzeFile(file);
+    setView("analyzing");
   }, []);
 
+  const handleMicStart = useCallback(() => setView("mic"), []);
+
+  const handleAnalysisComplete = useCallback((data) => {
+    setResult(data);
+    setView("result");
+  }, []);
+
+  const handleReset = useCallback(() => {
+    setResult(null);
+    setAnalyzeFile(null);
+    setView("upload");
+  }, []);
+
+  const handleShowAdmin = useCallback(() => setView("admin"), []);
+
   return (
-    <div className="app">
-      <div className="header">
-        <h1>Voice Risk Console</h1>
-        <span className="meta">{cases.length} cases</span>
-      </div>
-      <CaseQueue cases={cases} selectedId={selectedId} onSelect={setSelectedId} />
-      <div>
-        <CaseDetail caseId={selectedId} onReviewed={refresh} />
-        <LiveCall claimedChannel="app" onCallEnded={refresh} />
-      </div>
+    <div className="min-h-screen bg-bg">
+      <AnimatePresence mode="wait">
+        {view === "upload" && (
+          <UploadView
+            key="upload"
+            onFileSelected={handleFileSelected}
+            onMicStart={handleMicStart}
+          />
+        )}
+        {view === "mic" && (
+          <LiveMicView
+            key="mic"
+            onComplete={handleAnalysisComplete}
+            onBack={handleReset}
+          />
+        )}
+        {view === "analyzing" && (
+          <AnalyzingView
+            key="analyzing"
+            file={analyzeFile}
+            onComplete={handleAnalysisComplete}
+            onError={handleReset}
+          />
+        )}
+        {view === "result" && (
+          <ResultView
+            key="result"
+            result={result}
+            onReset={handleReset}
+            onShowAdmin={handleShowAdmin}
+          />
+        )}
+        {view === "admin" && (
+          <AdminView key="admin" onBack={handleReset} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

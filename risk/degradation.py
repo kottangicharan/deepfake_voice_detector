@@ -1,6 +1,7 @@
 """Degrade closed, never fail open: a signal that errors gets excluded, not trusted; a decision
 that can't run at all becomes a block-and-review, never a silent allow.
 """
+from dataclasses import replace
 from datetime import datetime, timezone
 from typing import Callable
 
@@ -48,7 +49,6 @@ def tighten_thresholds(thresholds: "PolicyThresholds", degraded: bool) -> "Polic
     toward friction rather than trusting a partially-blind decision."""
     if not degraded:
         return thresholds
-    from dataclasses import replace
 
     m = SIGNAL_UNAVAILABLE_MARGIN
     return replace(

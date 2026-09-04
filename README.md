@@ -65,7 +65,7 @@ no bulk download available) rather than silently dropped.
 python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
 .venv\Scripts\python -m pytest tests/          # 70+ tests, all independently runnable
-.venv\Scripts\python -m uvicorn api.main:app --reload   # backend on :8000
+.venv\Scripts\python -m uvicorn api.main:app --reload --port 8123   # backend on :8123
 cd frontend && npm install && npm run dev       # console on :5173
 ```
 

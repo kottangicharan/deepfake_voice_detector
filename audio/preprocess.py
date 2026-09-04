@@ -19,8 +19,18 @@ def _get_vad_model():
 
 
 def load_audio(path: str) -> tuple[np.ndarray, int]:
-    waveform, sr = sf.read(path, dtype="float32", always_2d=True)
-    return waveform.mean(axis=1), sr
+    """Loads audio as mono float32. Falls back to librosa's audioread/ffmpeg backend when
+    soundfile's libFLAC can't decode a file that's otherwise structurally valid — a real
+    libsndfile compatibility gap hit on a meaningful fraction of ASVspoof2021 DF's FLACs
+    (confirmed valid: correct fLaC header, reads fine in ffprobe), not actual corruption."""
+    try:
+        waveform, sr = sf.read(path, dtype="float32", always_2d=True)
+        return waveform.mean(axis=1), sr
+    except Exception:
+        import librosa
+
+        waveform, sr = librosa.load(path, sr=None, mono=True)
+        return waveform.astype(np.float32), sr
 
 
 def preprocess(waveform: np.ndarray, sr: int) -> np.ndarray | None:

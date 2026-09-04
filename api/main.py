@@ -15,7 +15,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile, WebSocket, W
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from audio.preprocess import load_audio
+from audio.preprocess import load_audio, preprocess
 from audit import enrollment_store, log as audit_log
 from risk.fusion import decide
 from signals.voiceprint import enroll as voiceprint_enroll
@@ -39,8 +39,6 @@ async def enroll_endpoint(owner_id: str = Form(...), audio: UploadFile = File(..
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
         tmp.write(await audio.read())
         tmp_path = tmp.name
-
-    from audio.preprocess import preprocess
 
     waveform, sr = load_audio(tmp_path)
     clean = preprocess(waveform, sr)
