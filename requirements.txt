@@ -1,0 +1,16 @@
+torch
+torchaudio
+soundfile
+silero-vad
+librosa
+torchinfo
+numpy
+scipy
+scikit-learn
+matplotlib
+speechbrain
+fastapi
+uvicorn[standard]
+python-multipart
+httpx
+pytest

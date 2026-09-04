@@ -1,0 +1,6 @@
+{
+  "p_low": 0.9818101823329926,
+  "p_high": 0.9999995231628418,
+  "n_samples": 8736,
+  "source": "scores_itw_clean.txt"
+}

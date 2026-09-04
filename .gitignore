@@ -1,0 +1,16 @@
+.venv/
+.claude/
+__pycache__/
+*.pyc
+third_party/*/
+*.flac
+*.wav
+*.pth
+*.safetensors
+*.ckpt
+audit/audit.db*
+audit/audio_store/
+frontend/node_modules/
+frontend/dist/
+scratch_*.sh
+
